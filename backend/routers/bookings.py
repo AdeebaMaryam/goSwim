@@ -6,8 +6,6 @@ from db.database import get_db
 from models.booking import Booking, BookingSlot, PoolOccupancy, BookingStatus
 from models.pool import Pool
 from models.user import User
-from models.notification import Notification
-from models.payment import Payment
 from schemas.booking import (
     BookingRequest, BookingResponse, BookingSlotRequest, BookingSlotResponse,
     PoolFacilityRequest, PoolFacilityResponse, OccupancyResponse, InvoiceResponse
@@ -360,19 +358,6 @@ def create_booking(
         )
         db.add(new_booking)
         owner = db.query(User).filter(User.id == pool.owner_id).first()
-        db.add(Notification(
-            user_id=user.id,
-            title="Booking created",
-            message=f"Your booking for {pool.name} is pending payment.",
-            channel="in_app"
-        ))
-        if owner:
-            db.add(Notification(
-                user_id=owner.id,
-                title="New pool booking",
-                message=f"{user.name or user.email} booked {pool.name} for {booking.start_time} on {booking.booking_date}.",
-                channel="in_app"
-            ))
         db.commit()
         db.refresh(new_booking)
         return new_booking
@@ -401,9 +386,9 @@ def get_user_booking_history(
 ):
     user = get_db_user(db, current_user)
     rows = (
-        db.query(Booking, Pool, Payment)
+        db.query(Booking, Pool)
         .join(Pool, Booking.pool_id == Pool.id)
-        .outerjoin(Payment, Payment.booking_id == Booking.id)
+        .outerjoin(booking_id == Booking.id)
         .filter(Booking.user_id == user.id)
         .order_by(Booking.created_at.desc())
         .all()

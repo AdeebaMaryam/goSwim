@@ -23,7 +23,7 @@ def load_local_env():
 
 load_local_env()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:1234@localhost:5432/goSwim")
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:123@localhost:5432/goSwim")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

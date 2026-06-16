@@ -42,7 +42,7 @@ client.loop_start()
 
 while True:
     reading = generate_reading()
-    topic = f"goswim/pool/{reading['pool_id']}/reading"
+    topic = f"goSwim/pool/{reading['pool_id']}/reading"
     client.publish(topic, json.dumps(reading))
     print(f"Published: {reading}")
     time.sleep(30)  # Every 30 seconds

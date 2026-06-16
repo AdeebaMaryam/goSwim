@@ -1,6 +1,7 @@
 import asyncio
 import os
 from pathlib import Path
+from mqtt.mqtt_client import start_mqtt_client
 
 
 def load_local_env():
@@ -24,7 +25,7 @@ load_local_env()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
-from routers import auth, pools, readings, devices, weather, bookings, payments, chat, notifications, external_pools
+from routers import pools, reading, weather, chat, auth
 from db.database import engine, Base
 from mqtt.mqtt_client import start_mqtt_client
 from websocket.manager import manager
@@ -50,20 +51,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(pools.router, prefix="/pools", tags=["pools"])
-app.include_router(readings.router, prefix="/readings", tags=["readings"])
-app.include_router(devices.router, prefix="/devices", tags=["devices"])
+app.include_router(reading.router, prefix="/reading", tags=["reading"])
 app.include_router(weather.router, prefix="/weather", tags=["weather"])
-app.include_router(bookings.router, tags=["bookings"])
-app.include_router(payments.router, tags=["payments"])
+# app.include_router(bookings.router, tags=["bookings"])
 app.include_router(chat.router, tags=["chat"])
-app.include_router(notifications.router, tags=["notifications"])
-app.include_router(external_pools.router, tags=["external-pools"])
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
 
 @app.on_event("startup")
 async def startup_event():
     # Start MQTT client in background
+    print("STARTUP EVENT RUNNING")
     asyncio.create_task(start_mqtt_client())
 
 @app.get("/")
