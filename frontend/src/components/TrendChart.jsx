@@ -11,7 +11,7 @@ const TrendChart = ({ poolId }) => {
 
   const fetchHistory = async () => {
     try {
-      const response = await api.get(`/readings/${poolId}/history?hours=24`);
+      const response = await api.get(`/reading/${poolId}/history?hours=24`);
       // Transform data for chart
       const chartData = response.data.map(reading => ({
         time: new Date(reading.time).toLocaleTimeString(),

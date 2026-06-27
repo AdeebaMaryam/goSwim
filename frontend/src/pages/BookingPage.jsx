@@ -59,7 +59,7 @@ const BookingPage = () => {
 
   const fetchAvailableSlots = async () => {
     try {
-      const response = await api.get(`/bookings/slots/${poolId}?date=${bookingData.booking_date}`);
+      const response = await api.get(`/booking/slots/${poolId}?date=${bookingData.booking_date}`);
       setAvailableSlots(response.data);
     } catch (error) {
       console.error('Error fetching slots:', error);
@@ -119,12 +119,20 @@ const BookingPage = () => {
     }
 
     try {
-      const response = await api.post('/bookings/', {
+      await api.post('/booking/', {
         pool_id: poolId,
         ...bookingData
       });
-      navigate(`/payment/${response.data.id}`);
+
+      alert(
+        "✅ Booking Confirmed!\n\n" +
+        "Please pay the entry fee at the swimming pool."
+      );
+
+      navigate("/profile?tab=booking");
+
     } catch (error) {
+
       console.error('Error creating booking:', error);
       if (error.response?.status === 401) {
         alert('Please log in before booking a pool.');
@@ -158,11 +166,10 @@ const BookingPage = () => {
           {[1, 2, 3].map((s) => (
             <motion.div key={s} className="flex items-center flex-1">
               <motion.div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
-                  s <= step
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-all ${s <= step
                     ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white'
                     : 'bg-slate-800 text-gray-400 border border-slate-700'
-                }`}
+                  }`}
                 whileHover={{ scale: 1.1 }}
               >
                 {s < step ? '✓' : s}
@@ -285,20 +292,18 @@ const BookingPage = () => {
                             type="button"
                             onClick={() => selectSlot(slot)}
                             disabled={isFull}
-                            className={`rounded-lg border px-4 py-3 text-left transition ${
-                              isSelected
+                            className={`rounded-lg border px-4 py-3 text-left transition ${isSelected
                                 ? 'border-cyan-400 bg-cyan-500/10 text-cyan-200'
                                 : isFull
                                   ? 'border-red-500/20 bg-red-500/10 text-red-200 opacity-70 cursor-not-allowed'
                                   : isTightFit
                                     ? 'border-amber-500/30 bg-amber-500/10 text-amber-100 hover:border-amber-400/50'
                                     : 'border-purple-500/20 bg-slate-800/40 text-gray-200 hover:border-cyan-400/40'
-                            }`}
+                              }`}
                           >
                             <div className="font-semibold">{slot.start_time} - {slot.end_time}</div>
-                            <div className={`text-sm ${
-                              isFull ? 'text-red-200' : isTightFit ? 'text-amber-200' : 'text-gray-400'
-                            }`}>
+                            <div className={`text-sm ${isFull ? 'text-red-200' : isTightFit ? 'text-amber-200' : 'text-gray-400'
+                              }`}>
                               {isFull ? 'Full' : `${remainingSpots} of ${slot.capacity} spots left`}
                             </div>
                           </button>
@@ -333,7 +338,7 @@ const BookingPage = () => {
                 transition={{ delay: 0.3 }}
               >
                 <div className="flex justify-between items-center">
-                  <span className="text-lg text-gray-300">Total Amount:</span>
+                  <span className="text-lg text-gray-300">Estimated Price:</span>
                   <span className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
                     ₹{totalAmount.toFixed(2)}
                   </span>

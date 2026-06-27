@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '../store/useStore';
 import { motion } from 'framer-motion';
-import { User, Settings, LogOut, Wallet, Heart, Phone, Mail, History, Sun, Moon, Monitor, Receipt } from 'lucide-react';
+import { User, Settings, LogOut, Heart, Phone, Mail, History, Sun, Moon, Monitor } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../utils/api';
 
@@ -14,28 +14,26 @@ const ProfilePage = () => {
   const [phoneNumber, setPhoneNumber] = useState(user?.phone || '');
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [pushNotifications, setPushNotifications] = useState(true);
-  const [bookings, setBookings] = useState([]);
-  const [payments, setPayments] = useState([]);
+  const [booking, setBooking] = useState([]);
   const [notifications, setNotifications] = useState([]);
-  const [loadingBookings, setLoadingBookings] = useState(false);
-  const [loadingPayments, setLoadingPayments] = useState(false);
+  const [loadingBooking, setLoadingBooking] = useState(false);
 
   useEffect(() => {
-    if (!user || activeTab !== 'bookings') return;
+    if (!user || activeTab !== 'booking') return;
 
-    const fetchBookings = async () => {
-      setLoadingBookings(true);
+    const fetchBooking = async () => {
+      setLoadingBooking(true);
       try {
-        const response = await api.get('/bookings/history');
-        setBookings(response.data);
+        const response = await api.get('/booking/history');
+        setBooking(response.data);
       } catch (error) {
         console.error('Error fetching bookings:', error);
       } finally {
-        setLoadingBookings(false);
+        setLoadingBooking(false);
       }
     };
 
-    fetchBookings();
+    fetchBooking();
   }, [activeTab, user]);
 
   useEffect(() => {
@@ -78,31 +76,9 @@ const ProfilePage = () => {
     handleThemeChange(theme);
   }, []);
 
-  useEffect(() => {
-    if (!user || activeTab !== 'payments') return;
-
-    const fetchPayments = async () => {
-      setLoadingPayments(true);
-      try {
-        const response = await api.get('/payments/');
-        setPayments(response.data);
-      } catch (error) {
-        console.error('Error fetching payments:', error);
-      } finally {
-        setLoadingPayments(false);
-      }
-    };
-
-    fetchPayments();
-  }, [activeTab, user]);
-
   const handleLogout = () => {
     logout();
     navigate('/');
-  };
-
-  const openInvoice = (bookingId) => {
-    navigate(`/invoice/${bookingId}`);
   };
 
   const handleThemeChange = (newTheme) => {
@@ -155,17 +131,15 @@ const ProfilePage = () => {
                 { id: 'profile', label: 'My Profile', icon: User },
                 { id: 'security', label: 'Theme', icon: Settings },
                 { id: 'notifications', label: 'Notifications', icon: Heart },
-                { id: 'bookings', label: 'My Bookings', icon: History },
-                { id: 'payments', label: 'Payments', icon: Wallet },
+                { id: 'booking', label: 'My Bookings', icon: History },
               ].map((item) => (
                 <motion.button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-                    activeTab === item.id
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${activeTab === item.id
                       ? 'bg-gradient-to-r from-purple-600/50 to-cyan-600/50 text-white'
                       : 'text-gray-300 hover:bg-slate-800/50'
-                  }`}
+                    }`}
                   whileHover={{ x: 5 }}
                 >
                   <item.icon className="w-5 h-5" />
@@ -232,11 +206,10 @@ const ProfilePage = () => {
                   <div>
                     <label className="text-gray-300 text-sm uppercase tracking-wide">Account Type</label>
                     <div className="mt-2 px-4 py-3 bg-slate-800/50 rounded-lg">
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                        user.role === 'owner'
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold ${user.role === 'owner'
                           ? 'bg-green-500/20 text-green-300'
                           : 'bg-cyan-500/20 text-cyan-300'
-                      }`}>
+                        }`}>
                         {user.role === 'owner' ? '🏊‍♂️ Pool Owner' : '🏊 Swimmer'}
                       </span>
                     </div>
@@ -262,11 +235,10 @@ const ProfilePage = () => {
                     <motion.button
                       key={option.id}
                       onClick={() => handleThemeChange(option.id)}
-                      className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ${
-                        theme === option.id
+                      className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all ${theme === option.id
                           ? 'border-cyan-400/50 bg-cyan-400/10'
                           : 'border-purple-500/20 bg-slate-800/50 hover:border-purple-500/40'
-                      }`}
+                        }`}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -323,9 +295,8 @@ const ProfilePage = () => {
                       </div>
                       <motion.button
                         onClick={() => notif.setState(!notif.state)}
-                        className={`relative w-14 h-8 rounded-full transition-all ${
-                          notif.state ? 'bg-cyan-500/50' : 'bg-slate-700'
-                        }`}
+                        className={`relative w-14 h-8 rounded-full transition-all ${notif.state ? 'bg-cyan-500/50' : 'bg-slate-700'
+                          }`}
                         animate={{
                           backgroundColor: notif.state ? '#22d3ee' : '#374151'
                         }}
@@ -344,19 +315,19 @@ const ProfilePage = () => {
             )}
 
             {/* Bookings Tab */}
-            {activeTab === 'bookings' && (
+            {activeTab === 'booking' && (
               <div className="bg-slate-900/50 backdrop-blur-lg border border-purple-500/20 rounded-2xl p-8">
                 <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
                   <History className="w-6 h-6 text-cyan-400" />
                   My Bookings
                 </h2>
-                {loadingBookings ? (
+                {loadingBooking ? (
                   <p className="text-gray-300">Loading bookings...</p>
-                ) : bookings.length === 0 ? (
+                ) : booking.length === 0 ? (
                   <p className="text-gray-300">No bookings found yet.</p>
                 ) : (
                   <div className="space-y-4">
-                    {bookings.map((booking) => (
+                    {booking.map((booking) => (
                       <div key={booking.id} className="p-4 bg-slate-800/50 rounded-lg border border-purple-500/10">
                         <div className="flex flex-wrap justify-between gap-3 text-white">
                           <span className="font-semibold">{booking.pool_name || 'Pool booking'}</span>
@@ -371,63 +342,9 @@ const ProfilePage = () => {
                           <span>{booking.number_of_people} guest{booking.number_of_people === 1 ? '' : 's'}</span>
                           <span>Rs {Number(booking.total_amount || 0).toFixed(2)}</span>
                         </div>
-                        <div className="mt-2 flex flex-wrap gap-3 text-sm">
-                          <span className="capitalize text-cyan-300">
-                            Payment: {booking.payment_status || 'pending'}
-                          </span>
-                          {booking.payment_method && (
-                            <span className="capitalize text-gray-400">
-                              {booking.payment_method}
-                            </span>
-                          )}
+                        <div className="mt-2 text-cyan-300">
+                          Booking Confirmed
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => openInvoice(booking.id)}
-                          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-2 text-sm font-semibold text-white"
-                        >
-                          <Receipt className="h-4 w-4" />
-                          View Invoice
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Payments Tab */}
-            {activeTab === 'payments' && (
-              <div className="bg-slate-900/50 backdrop-blur-lg border border-purple-500/20 rounded-2xl p-8">
-                <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-                  <Wallet className="w-6 h-6 text-cyan-400" />
-                  Payment Methods
-                </h2>
-                {loadingPayments ? (
-                  <p className="text-gray-300">Loading payments...</p>
-                ) : payments.length === 0 ? (
-                  <p className="text-gray-300">No payments found yet.</p>
-                ) : (
-                  <div className="space-y-4">
-                    {payments.map((payment) => (
-                      <div key={payment.id} className="p-4 bg-slate-800/50 rounded-lg border border-purple-500/10">
-                        <div className="flex flex-wrap justify-between gap-3 text-white">
-                          <span className="font-semibold">Rs {Number(payment.amount || 0).toFixed(2)}</span>
-                          <span className="capitalize text-cyan-300">{payment.status}</span>
-                        </div>
-                        <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2 text-sm text-gray-300">
-                          <span className="capitalize">{payment.payment_method}</span>
-                          <span>{payment.transaction_id || 'No transaction id'}</span>
-                          <span>{payment.created_at ? new Date(payment.created_at).toLocaleString() : ''}</span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => openInvoice(payment.booking_id)}
-                          className="mt-4 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-600 px-4 py-2 text-sm font-semibold text-white"
-                        >
-                          <Receipt className="h-4 w-4" />
-                          View Invoice
-                        </button>
                       </div>
                     ))}
                   </div>

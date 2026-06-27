@@ -1,18 +1,22 @@
 from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
 
+
 class SensorReadingBase(BaseModel):
-    ph: Optional[float] = None
-    tds: Optional[float] = None
+    ph: float
+    tds: float
+    temperature: float
+    cleanliness_score: float
+
 
 class SensorReadingCreate(SensorReadingBase):
     pool_id: str
-    time: datetime
+
 
 class SensorReading(SensorReadingBase):
-    time: datetime
+    id: int
     pool_id: str
+    time: datetime
 
     class Config:
         from_attributes = True

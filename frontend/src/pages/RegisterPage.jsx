@@ -9,68 +9,7 @@ import { useAuthStore } from '../store/useStore';
 const RegisterPage = () => {
   const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '', role: 'swimmer' });
   const { register, loading, error } = useAuth();
-  const { login } = useAuthStore();
   const navigate = useNavigate();
-  const googleButtonRef = useRef(null);
-
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
-      const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-      if (!clientId || !window.google?.accounts?.id) return;
-
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: window.handleGoogleRegisterCallback,
-      });
-
-      if (googleButtonRef.current) {
-        window.google.accounts.id.renderButton(googleButtonRef.current, {
-          theme: 'outline',
-          size: 'large',
-          text: 'signup_with',
-          width: '100%',
-        });
-      }
-      window.google.accounts.id.prompt();
-    };
-
-    document.head.appendChild(script);
-    return () => {
-      try {
-        document.head.removeChild(script);
-      } catch (e) {
-        // Script already removed.
-      }
-    };
-  }, []);
-
-  const handleGoogleRegisterCallback = async (response) => {
-    if (!response.credential) return;
-
-    try {
-      const result = await api.post('/auth/google-login', {
-        token: response.credential,
-        role: formData.role
-      });
-      localStorage.setItem('token', result.data.access_token);
-      login(result.data.user);
-      navigate('/explore');
-    } catch (err) {
-      alert(err.response?.data?.detail || 'Google sign up failed');
-    }
-  };
-
-  useEffect(() => {
-    window.handleGoogleRegisterCallback = handleGoogleRegisterCallback;
-    return () => {
-      delete window.handleGoogleRegisterCallback;
-    };
-  }, [handleGoogleRegisterCallback]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -199,17 +138,6 @@ const RegisterPage = () => {
                   {error}
                 </motion.div>
               )}
-
-              <div className="relative pt-2">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-purple-500/30"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-slate-950/90 text-gray-400">Or sign up with</span>
-                </div>
-              </div>
-
-              <div ref={googleButtonRef} className="flex justify-center" />
 
               <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                 <button

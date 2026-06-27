@@ -9,93 +9,17 @@ import { useAuthStore } from '../store/useStore';
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const { loginUser, loading, error } = useAuth();
-  const { login } = useAuthStore();
   const navigate = useNavigate();
-  const googleButtonRef = useRef(null);
-
-  useEffect(() => {
-    // Load Google Sign-In SDK
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
-      // Initialize Google Sign-In after SDK loads
-      if (window.google && window.google.accounts && window.google.accounts.id) {
-        const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-        if (!clientId) {
-          console.warn('VITE_GOOGLE_CLIENT_ID not configured');
-          return;
-        }
-
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          callback: window.handleGoogleCallback,
-        });
-
-        // Render button in the container
-        if (googleButtonRef.current) {
-          window.google.accounts.id.renderButton(googleButtonRef.current, {
-            theme: 'outline',
-            size: 'large',
-            text: 'signin_with',
-            width: '100%',
-          });
-        }
-        window.google.accounts.id.prompt();
-      }
-    };
-
-    document.head.appendChild(script);
-
-    return () => {
-      try {
-        document.head.removeChild(script);
-      } catch (e) {
-        // Script already removed
-      }
-    };
-  }, []);
-
-  const handleGoogleCallback = async (response) => {
-    if (response.credential) {
-      try {
-        const result = await api.post('/auth/google-login', { token: response.credential });
-        const data = result.data;
-        if (data.access_token) {
-          localStorage.setItem('token', data.access_token);
-          login(data.user);
-          navigate('/explore');
-        } else {
-          alert('Login failed. Please try again.');
-        }
-      } catch (error) {
-        console.error('Google login error:', error);
-        alert('An error occurred during login');
-      }
-    }
-  };
-
-  // Expose callback to window for Google Sign-In
-  useEffect(() => {
-    window.handleGoogleCallback = handleGoogleCallback;
-    return () => {
-      delete window.handleGoogleCallback;
-    };
-  }, [handleGoogleCallback, navigate]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       await loginUser(formData);
-      navigate('/explore');
+      navigate("/explore");
     } catch (err) {
-      // Error handled in hook
+      // handled by useAuth
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-950 relative overflow-hidden">
       {/* Animated gradient orbs */}
@@ -192,22 +116,6 @@ const LoginPage = () => {
                   {loading ? 'Signing in...' : 'Sign in'}
                 </button>
               </motion.div>
-
-              {/* Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-purple-500/30"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-slate-950/90 text-gray-400">Or continue with</span>
-                </div>
-              </div>
-
-              {/* Google Sign In Button */}
-              <div
-                ref={googleButtonRef}
-                className="flex justify-center"
-              />
 
               <motion.div
                 className="text-center"

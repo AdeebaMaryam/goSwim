@@ -4,8 +4,6 @@ from db.database import get_db
 from models.user import User as UserModel
 from schemas.user import UserCreate, UserLogin, User as UserSchema
 from utils.security import verify_password, get_password_hash, create_access_token, get_current_user
-import json
-import base64
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -14,7 +12,7 @@ router = APIRouter()
 class ProfileUpdateRequest(BaseModel):
     phone: str | None = None
 
-ALLOWED_ROLES = ["swimmer", "owner", "admin"]
+ALLOWED_ROLES = ["swimmer", "owner"]
 
 
 # 🔐 REGISTER

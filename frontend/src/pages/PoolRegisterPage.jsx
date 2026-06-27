@@ -70,7 +70,7 @@ const PoolRegisterPage = () => {
           });
 
           try {
-            const facilityResponse = await api.get(`/bookings/${existingPool.id}/facilities`);
+            const facilityResponse = await api.get(`/booking/${existingPool.id}/facilities`);
             setFacilities({
               has_lifeguard: facilityResponse.data.has_lifeguard,
               has_emergency_equipment: facilityResponse.data.has_emergency_equipment,
@@ -135,7 +135,7 @@ const PoolRegisterPage = () => {
         : await api.post('/pools/', payload);
       const poolId = poolResponse.data.id;
 
-      await api.post('/bookings/facilities', {
+      await api.post('/booking/facilities', {
         pool_id: poolId,
         ...facilities
       });

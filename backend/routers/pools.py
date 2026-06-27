@@ -96,15 +96,17 @@ def create_pool(
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
 
-    if user.role not in ["owner", "admin"]:
+    if user.role != "owner":
         raise HTTPException(status_code=403, detail="Not authorized - only pool owners can register pools")
 
     existing_pool = db.query(Pool).filter(Pool.owner_id == user.id).first()
-    if existing_pool and user.role != "admin":
+
+    if existing_pool:
         raise HTTPException(
             status_code=400,
             detail="You can register only one pool. Update or delete your existing pool instead."
         )
+        
 
     db_pool = Pool(**pool.dict(), owner_id=user.id)
 
@@ -138,10 +140,12 @@ def update_pool(
     current_id = str(user.id)
 
     is_owner = owner_id == current_id
-    is_admin = bool(user.role == "admin")
 
-    if not (is_owner or is_admin):
-        raise HTTPException(status_code=403, detail="Not authorized")
+    if not is_owner:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
 
     for key, value in pool.dict(exclude_unset=True).items():
         setattr(db_pool, key, value)
@@ -167,10 +171,13 @@ def delete_pool(
         raise HTTPException(status_code=404, detail="Pool is not registered")
 
     is_owner = str(db_pool.owner_id) == str(user.id)
-    is_admin = bool(user.role == "admin")
-    if not (is_owner or is_admin):
-        raise HTTPException(status_code=403, detail="Not authorized")
 
+    if not is_owner:
+        raise HTTPException(
+            status_code=403,
+            detail="Not authorized"
+        )
+    
     db.delete(db_pool)
     db.commit()
     return {"message": "Pool deleted successfully"}

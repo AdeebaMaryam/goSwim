@@ -9,7 +9,7 @@ CREATE TABLE users (
   name VARCHAR(100),
   email VARCHAR(100) UNIQUE NOT NULL,
   password_hash TEXT NOT NULL,
-  role VARCHAR(20) CHECK (role IN ('swimmer', 'owner', 'admin')),
+  role VARCHAR(20) CHECK (role IN ('swimmer', 'owner')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -45,7 +45,7 @@ CREATE TABLE iot_devices (
 );
 
 -- sensor_readings table (TimescaleDB hypertable)
-CREATE TABLE sensor_readings (
+CREATE TABLE sensor_reading (
   time TIMESTAMPTZ NOT NULL,
   pool_id UUID NOT NULL,
   device_id UUID,
@@ -58,7 +58,7 @@ CREATE TABLE sensor_readings (
 );
 
 -- Convert to hypertable
-SELECT create_hypertable('sensor_readings', 'time');
+SELECT create_hypertable('sensor_reading', 'time');
 
 -- alerts table
 CREATE TABLE alerts (

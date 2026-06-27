@@ -9,7 +9,7 @@ from models.user import User
 from utils.security import get_current_user
 import uuid
 
-router = APIRouter(prefix="/chat", tags=["chat"])
+router = APIRouter()
 
 class ChatMessageRequest(BaseModel):
     pool_id: str

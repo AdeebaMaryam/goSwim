@@ -28,7 +28,7 @@ def generate_reading():
         "chlorine_ppm": chlorine_ppm,
         "temperature_c": temperature_c,
         "turbidity_ntu": turbidity_ntu,
-        "timestamp": datetime.utcnow().isoformat() + "Z"
+        "timestamp": datetime.now().isoformat() + "Z"
     }
 
 def on_connect(client, userdata, flags, rc):

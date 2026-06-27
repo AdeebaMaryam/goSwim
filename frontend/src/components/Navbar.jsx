@@ -53,7 +53,7 @@ const Navbar = () => {
                     <Link to="/explore" className="text-white hover:text-cyan-300 transition-colors duration-300 font-medium">
                       Explore
                     </Link>
-                    <Link to="/profile?tab=bookings" className="text-white hover:text-cyan-300 transition-colors duration-300 font-medium inline-flex items-center gap-2">
+                    <Link to="/profile?tab=booking" className="text-white hover:text-cyan-300 transition-colors duration-300 font-medium inline-flex items-center gap-2">
                       <History className="w-4 h-4" />
                       Booking History
                     </Link>

@@ -15,7 +15,7 @@ const OwnerDashboard = () => {
   const [pools, setPools] = useState([]);
   const [selectedPoolId, setSelectedPoolId] = useState('');
   const [latestReading, setLatestReading] = useState(null);
-  const [ownerBookings, setOwnerBookings] = useState([]);
+  const [ownerBooking, setOwnerBooking] = useState([]);
   const [slots, setSlots] = useState([]);
   const [slotLoading, setSlotLoading] = useState(false);
   const [slotForm, setSlotForm] = useState({
@@ -50,7 +50,7 @@ const OwnerDashboard = () => {
     const fetchLatestReading = async () => {
       if (!poolId) return;
       try {
-        const response = await api.get(`/readings/${poolId}/latest`);
+        const response = await api.get(`/reading/${poolId}/latest`);
         setLatestReading(response.data);
       } catch (error) {
         setLatestReading(null);
@@ -61,17 +61,17 @@ const OwnerDashboard = () => {
   }, [poolId]);
 
   useEffect(() => {
-    const fetchOwnerBookings = async () => {
-      if (activeTab !== 'bookings') return;
+    const fetchOwnerBooking = async () => {
+      if (activeTab !== 'booking') return;
       try {
-        const response = await api.get('/bookings/owner');
-        setOwnerBookings(response.data.filter((booking) => booking.pool_id === poolId));
+        const response = await api.get('/booking/owner');
+        setOwnerBooking(response.data.filter((booking) => booking.pool_id === poolId));
       } catch (error) {
         console.error('Error fetching owner bookings:', error);
       }
     };
 
-    fetchOwnerBookings();
+    fetchOwnerBooking();
   }, [activeTab, poolId]);
 
   useEffect(() => {
@@ -83,7 +83,7 @@ const OwnerDashboard = () => {
 
       setSlotLoading(true);
       try {
-        const response = await api.get(`/bookings/slots/${poolId}?date=${slotForm.slot_date}`);
+        const response = await api.get(`/booking/slots/${poolId}?date=${slotForm.slot_date}`);
         setSlots(response.data);
       } catch (error) {
         console.error('Error fetching slots:', error);
@@ -102,8 +102,7 @@ const OwnerDashboard = () => {
     { id: 'live', name: 'Live Data' },
     { id: 'trends', name: 'Trends' },
     { id: 'devices', name: 'Devices' },
-    { id: 'bookings', name: 'My Bookings' },
-    { id: 'reports', name: 'Reports' },
+    { id: 'booking', name: 'My Bookings' },
   ];
 
   const selectedPool = pools.find((pool) => pool.id === poolId);
@@ -118,7 +117,7 @@ const OwnerDashboard = () => {
       alert('Pool deleted successfully');
       setSelectedPoolId('');
       setLatestReading(null);
-      setOwnerBookings([]);
+      setOwnerBooking([]);
       fetchOwnerPools();
       navigate('/owner/dashboard');
     } catch (error) {
@@ -152,7 +151,7 @@ const OwnerDashboard = () => {
     if (!poolId) return;
 
     try {
-      await api.post('/bookings/slots', {
+      await api.post('/booking/slots', {
         pool_id: poolId,
         slot_date: slotForm.slot_date,
         start_time: slotForm.start_time,
@@ -170,7 +169,7 @@ const OwnerDashboard = () => {
         price_per_slot: ''
       }));
 
-      const response = await api.get(`/bookings/slots/${poolId}?date=${slotForm.slot_date}`);
+      const response = await api.get(`/booking/slots/${poolId}?date=${slotForm.slot_date}`);
       setSlots(response.data);
     } catch (error) {
       alert(error.response?.data?.detail || 'Failed to create slot');
@@ -182,7 +181,7 @@ const OwnerDashboard = () => {
     if (!confirmed) return;
 
     try {
-      await api.delete(`/bookings/slots/${slotId}`);
+      await api.delete(`/booking/slots/${slotId}`);
       setSlots((currentSlots) => currentSlots.filter((slot) => slot.id !== slotId));
     } catch (error) {
       alert(error.response?.data?.detail || 'Failed to delete slot');
@@ -299,7 +298,7 @@ const OwnerDashboard = () => {
               <div className="rounded-xl border border-purple-500/20 bg-slate-900/50 p-5">
                 <div className="text-sm text-gray-400 mb-2">Booking Status</div>
                 <div className={`text-xl font-bold ${selectedPool.is_open ? 'text-green-300' : 'text-amber-300'}`}>
-                  {selectedPool.is_open ? 'Open for bookings' : 'Bookings paused'}
+                  {selectedPool.is_open ? 'Open for booking' : 'Booking paused'}
                 </div>
               </div>
               <div className="rounded-xl border border-purple-500/20 bg-slate-900/50 p-5">
@@ -332,7 +331,7 @@ const OwnerDashboard = () => {
                         : 'border border-green-500/40 bg-green-500/10 text-green-200 hover:bg-green-500/20'
                     }`}
                   >
-                    {selectedPool.is_open ? 'Pause Bookings' : 'Open Bookings'}
+                    {selectedPool.is_open ? 'Pause Booking' : 'Open Booking'}
                   </button>
                   <Link
                     to="/owner/register-pool"
@@ -497,16 +496,16 @@ const OwnerDashboard = () => {
           </motion.div>
         )}
 
-        {activeTab === 'bookings' && (
+        {activeTab === 'booking' && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
             <h2 className="text-2xl font-semibold text-white mb-6">Users Who Booked This Pool</h2>
-            {ownerBookings.length === 0 ? (
+            {ownerBooking.length === 0 ? (
               <div className="bg-slate-950/70 backdrop-blur-sm border border-purple-500/20 rounded-xl p-6 text-gray-300">
                 No bookings found for this pool yet.
               </div>
             ) : (
               <div className="space-y-4">
-                {ownerBookings.map((booking) => (
+                {ownerBooking.map((booking) => (
                   <div key={booking.id} className="bg-slate-900/50 border border-purple-500/20 rounded-xl p-6">
                     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-gray-200 mb-4">
                       <div>
@@ -539,21 +538,9 @@ const OwnerDashboard = () => {
             )}
           </motion.div>
         )}
-
-        {activeTab === 'reports' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="bg-slate-950/70 backdrop-blur-sm border border-purple-500/20 rounded-xl p-8 text-center"
-          >
-            <h2 className="text-2xl font-semibold text-white mb-6">Reports</h2>
-            <p className="text-gray-100 text-lg font-medium">Reports will use the same backend data as readings, devices, bookings, and payments.</p>
-          </motion.div>
-        )}
       </div>
     </div>
   );
-};
+}
 
 export default OwnerDashboard;

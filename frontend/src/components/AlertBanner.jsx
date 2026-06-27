@@ -9,7 +9,7 @@ const AlertBanner = ({ poolId }) => {
     const fetchAlerts = async () => {
       if (!poolId) return;
       try {
-        const response = await api.get(`/readings/${poolId}/alerts`);
+        const response = await api.get(`/reading/${poolId}/alerts`);
         setAlerts(response.data);
       } catch (error) {
         setAlerts([{
