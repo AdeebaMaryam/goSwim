@@ -7,3 +7,7 @@ passlib[bcrypt]
 paho-mqtt
 requests
 python-multipart
+python-dotenv
+pydantic
+email-validator
+bcrypt==4.0.1
