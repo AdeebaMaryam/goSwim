@@ -106,6 +106,8 @@ app.add_middleware(
         "http://localhost:3000",
         "https://goswimmm.vercel.app",
     ],
+    
+    allow_origin_regex=r"https://.*\.vercel\.app"
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
