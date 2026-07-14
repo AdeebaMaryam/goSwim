@@ -10,7 +10,7 @@ from db.database import engine, Base
 from mqtt.mqtt_client import start_mqtt_client
 from routers import auth, chat, pools, reading, weather, booking
 from websocket.manager import manager
-
+from fastapi.middleware.cors import CORSMiddleware
 
 # -----------------------------
 # Load .env file
