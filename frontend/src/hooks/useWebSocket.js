@@ -11,7 +11,7 @@ export const useWebSocket = (poolId) => {
   };
 
   const connect = () => {
-    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000';
+    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://https://goswim-backend.onrender.com';
     ws.current = new WebSocket(`${wsUrl}/ws/${poolId}`);
 
     ws.current.onopen = () => {};
